@@ -8,16 +8,10 @@
 ### Стэк технологий 
 - Java 11
 - Selenium
-- ChromeDriver
+- WebDriverManager
 - Gradle
 - Lombok
  
-
- ## Старт
- 
- ### Необходимо:
- - Java 11
- - Chrome 
 
 ## Сборка приложения
 ```shell script
@@ -44,4 +38,5 @@ gradlew run --args="38:36:000034:2954"
 - Собрать jar.
 - Разобраться с кодировками.
 - Дописать тесты. (JUnit, Mockito).
+- Реализовать для массива параметров.
 - Интегрировать в Spring для реализации API.
