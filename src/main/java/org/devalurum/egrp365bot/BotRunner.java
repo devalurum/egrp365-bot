@@ -16,7 +16,7 @@ public class BotRunner {
         Egrp365Bot bot = new Egrp365Bot();
         EgrpEntity address = bot.getInfo(searchCadastralNumber);
         System.out.println(address);
-        bot.closeBrowser();
+        bot.shutdownBot();
 
     }
 
