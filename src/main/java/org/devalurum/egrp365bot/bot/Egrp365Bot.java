@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.devalurum.egrp365bot.utils.Constants.*;
 
@@ -58,9 +59,7 @@ public class Egrp365Bot {
             wait.until(ExpectedConditions.elementToBeClickable(show));
             show.click();
 
-            Map<String, String> info = new LinkedHashMap<>();
-
-            setFullInfo(wait, info);
+            Map<String, String> info = setFullInfo(wait);
 
             WebElement addressElem = driver.findElement(By.className(CLASS_WITH_ADDRESS));
             WebElement coordElem = driver.findElement(By.className(CLASS_WITH_COORDINATES));
@@ -88,39 +87,32 @@ public class Egrp365Bot {
         }
     }
 
-    private void setFullInfo(WebDriverWait wait, Map<String, String> map) {
+    private Map<String, String> setFullInfo(WebDriverWait wait) {
 
-        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(MAIN_BLOCKS)))
-                .forEach(elementMain -> {
-                    String key = new String(elementMain.findElement(By.className(MAIN_HEADER))
-                            .getText()
-                            .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                            .intern();
+        Map<String, String> mainInfo = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(MAIN_BLOCKS)))
+                .stream().collect(Collectors.toMap(elem -> new String(elem.findElement(By.className(MAIN_HEADER))
+                        .getText()
+                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+                        .intern(), elem -> new String(elem.findElement(By.className(MAIN_TEXT))
+                        .getText()
+                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+                        .intern(), (x, y) -> x, LinkedHashMap::new));
 
-                    String value = new String(elementMain.findElement(By.className(MAIN_TEXT))
-                            .getText()
-                            .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                            .intern();
-                    map.put(key, value);
-                });
+        Map<String, String> moreInfo = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(MORE_BLOCKS)))
+                .stream().collect(Collectors.toMap(elem -> new String(elem.findElement(By.className(MORE_HEADER))
+                        .getText()
+                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+                        .intern(), elem -> new String(elem.findElement(By.className(MORE_TEXT))
+                        .getText()
+                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+                        .intern(), (x, y) -> x, LinkedHashMap::new));
 
-        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(MORE_BLOCKS)))
-                .forEach(elementMore -> {
-                    String key = new String(elementMore.findElement(By.className(MORE_HEADER))
-                            .getText()
-                            .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                            .intern();
-                    String value = new String(elementMore.findElement(By.className(MORE_TEXT))
-                            .getText()
-                            .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                            .intern();
+        mainInfo.putAll(moreInfo);
 
-                    map.put(key, value);
-                });
+        return mainInfo;
     }
 
     public void shutdownBot() {
-        driver.close();
         driver.quit();
     }
 }
