@@ -6,6 +6,7 @@ plugins {
 group 'org.devalurum'
 version '1.0'
 sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
@@ -14,22 +15,25 @@ repositories {
 ext {
     fingBugsVersion = "3.0.2"
     seleniumVersion = '4.1.3'
-    chromeDriverVersion = "5.1.1"
+    webDriverVersion = "5.2.0"
     lombokVersion = "1.18.24"
     slf4jNopVersion = "1.7.36"
+    apacheCommonsVersion = "3.0"
 }
 
 dependencies {
     implementation "com.google.code.findbugs:jsr305:$fingBugsVersion"
     implementation "org.seleniumhq.selenium:selenium-java:$seleniumVersion"
-    implementation "io.github.bonigarcia:webdrivermanager:$chromeDriverVersion"
+    implementation "io.github.bonigarcia:webdrivermanager:$webDriverVersion"
 
     implementation "org.slf4j:slf4j-nop:$slf4jNopVersion"
+    implementation "org.apache.commons:commons-lang3:$apacheCommonsVersion"
 
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testImplementation 'org.mockito:mockito-core:4.6.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
 
@@ -45,16 +49,18 @@ jar {
 
     manifest {
         attributes(
-                'Main-Class': 'org.devalurum.egrp365bot.BotRunner'
+                'Main-Class': 'org.devalurum.egrp365bot.BotRunner',
+                'Class-Path': configurations.compileClasspath.files.collect { it.getName() }.join(' ')
+
         )
     }
 
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    from { (configurations.compileClasspath).collect { it.isDirectory() ? it : zipTree(it) } } {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
     }
 }
 
-application{
+application {
     applicationDefaultJvmArgs = ['-Dfile.encoding=UTF8']
 }
 
