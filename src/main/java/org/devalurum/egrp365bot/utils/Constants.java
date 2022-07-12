@@ -10,6 +10,7 @@ public final class Constants {
     public final static String CLASS_WITH_COORDINATES = "more-info__info-item-coords";
     public final static String CLASS_WITH_ADDRESS = "address-text";
     public final static String CLASS_SHOW_MORE_INFO = "more-info__show";
+    public final static String CLASS_MORE_INFO = "more-info";
 
     public final static String MAIN_BLOCKS = ".main_info_block-content > .info__info-item";
     public final static String MAIN_HEADER = "info__info-item-header";

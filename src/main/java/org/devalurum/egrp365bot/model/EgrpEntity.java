@@ -16,6 +16,7 @@ public class EgrpEntity {
     private double latitude;
     private double longitude;
 
+    //ToDo: переделать на точные поля (нет чёткого понимания какие могут быть поля, они меняются)
     private Map<String, String> fullInfo;
 
 }

@@ -1,6 +1,7 @@
 package org.devalurum.egrp365bot.bot;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.lang3.StringUtils;
 import org.devalurum.egrp365bot.exception.Egrp365BotException;
 import org.devalurum.egrp365bot.model.EgrpEntity;
 import org.openqa.selenium.By;
@@ -12,7 +13,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.annotation.Nonnull;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,10 +36,11 @@ public class Egrp365Bot {
         this.driver.manage().window().minimize();
         this.driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownBot));
+        this.listenerForClosingAfterShutdown();
     }
 
     public EgrpEntity getInfo(@Nonnull String cadastralNumber) {
+
         try {
             driver.get(String.format(EGRP365_URL, cadastralNumber));
 
@@ -49,6 +50,10 @@ public class Egrp365Bot {
             wait.until(webDriver -> ((JavascriptExecutor) webDriver)
                     .executeScript("return document.readyState")
                     .equals("complete"));
+
+            wait.until(webDriver -> ((JavascriptExecutor) webDriver))
+                    .executeScript(String.format("document.getElementsByClassName('%s')[0].style.display='inline-block';",
+                            CLASS_MORE_INFO));
 
             if (driver.findElements(By.className(CLASS_SHOW_MORE_INFO)).isEmpty()) {
                 throw new Egrp365BotException(String.format("Object with number:'%s' not found",
@@ -68,14 +73,9 @@ public class Egrp365Bot {
             double lat = Double.parseDouble(coordStr[0]);
             double lon = Double.parseDouble(coordStr[1]);
 
-            String address = new String(addressElem
-                    .getText()
-                    .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                    .intern();
-
             return EgrpEntity.builder()
                     .cadastralNumber(cadastralNumber)
-                    .address(address)
+                    .address(addressElem.getText())
                     .fullInfo(info)
                     .latitude(lat)
                     .longitude(lon)
@@ -89,27 +89,25 @@ public class Egrp365Bot {
 
     private Map<String, String> setFullInfo(WebDriverWait wait) {
 
-        Map<String, String> mainInfo = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(MAIN_BLOCKS)))
-                .stream().collect(Collectors.toMap(elem -> new String(elem.findElement(By.className(MAIN_HEADER))
-                        .getText()
-                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                        .intern(), elem -> new String(elem.findElement(By.className(MAIN_TEXT))
-                        .getText()
-                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                        .intern(), (x, y) -> x, LinkedHashMap::new));
+        Map<String, String> mainInfo = wait.until(ExpectedConditions.
+                        visibilityOfAllElementsLocatedBy(By.cssSelector(MAIN_BLOCKS)))
+                .stream().collect(Collectors.toMap(elem -> StringUtils.chop(elem.findElement(By.className(MAIN_HEADER))
+                        .getText()), elem -> elem.findElement(By.className(MAIN_TEXT))
+                        .getText(), (x, y) -> x, LinkedHashMap::new));
 
-        Map<String, String> moreInfo = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(MORE_BLOCKS)))
-                .stream().collect(Collectors.toMap(elem -> new String(elem.findElement(By.className(MORE_HEADER))
-                        .getText()
-                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                        .intern(), elem -> new String(elem.findElement(By.className(MORE_TEXT))
-                        .getText()
-                        .getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8)
-                        .intern(), (x, y) -> x, LinkedHashMap::new));
+        Map<String, String> moreInfo = wait.until(ExpectedConditions.
+                        visibilityOfAllElementsLocatedBy(By.cssSelector(MORE_BLOCKS)))
+                .stream().collect(Collectors.toMap(elem -> StringUtils.chop(elem.findElement(By.className(MORE_HEADER))
+                        .getText()), elem -> elem.findElement(By.className(MORE_TEXT))
+                        .getText(), (x, y) -> x, LinkedHashMap::new));
 
         mainInfo.putAll(moreInfo);
 
         return mainInfo;
+    }
+
+    private void listenerForClosingAfterShutdown() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownBot));
     }
 
     public void shutdownBot() {
