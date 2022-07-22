@@ -2,6 +2,8 @@ package org.devalurum.egrp365bot;
 
 import org.devalurum.egrp365bot.bot.Egrp365Bot;
 import org.devalurum.egrp365bot.model.EgrpEntity;
+import org.devalurum.egrp365bot.webdriver.Browsers;
+import org.openqa.selenium.WebDriver;
 
 import javax.annotation.Nonnull;
 import java.util.Scanner;
@@ -13,7 +15,9 @@ public class BotRunner {
 
         final String searchCadastralNumber = getCadastralNumber(args);
 
-        Egrp365Bot bot = new Egrp365Bot();
+        WebDriver browser = Browsers.CHROME.setup();
+
+        Egrp365Bot bot = new Egrp365Bot(browser);
         EgrpEntity address = bot.getInfo(searchCadastralNumber);
         System.out.println(address);
         bot.shutdownBot();
