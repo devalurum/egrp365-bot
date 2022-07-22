@@ -39,6 +39,13 @@ public class Egrp365Bot {
         this.listenerForClosingAfterShutdown();
     }
 
+    public Egrp365Bot(WebDriver driver) {
+        this.driver = driver;
+
+        this.listenerForClosingAfterShutdown();
+    }
+
+
     public EgrpEntity getInfo(@Nonnull String cadastralNumber) {
 
         try {
@@ -51,9 +58,14 @@ public class Egrp365Bot {
                     .executeScript("return document.readyState")
                     .equals("complete"));
 
-            wait.until(webDriver -> ((JavascriptExecutor) webDriver))
-                    .executeScript(String.format("document.getElementsByClassName('%s')[0].style.display='inline-block';",
-                            CLASS_MORE_INFO));
+            WebElement divMore = wait.until(ExpectedConditions.presenceOfElementLocated(By.className(CLASS_MORE_INFO)));
+            String classMore = divMore.getAttribute("class");
+
+            wait.until(webDriver -> ((JavascriptExecutor) webDriver)
+                    .executeScript(String.format("return document.getElementsByClassName('%s')[0].style.display='inline-block'",
+                            classMore))
+                    .equals("inline-block"));
+
 
             if (driver.findElements(By.className(CLASS_SHOW_MORE_INFO)).isEmpty()) {
                 throw new Egrp365BotException(String.format("Object with number:'%s' not found",
