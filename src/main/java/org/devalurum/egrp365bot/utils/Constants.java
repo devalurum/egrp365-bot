@@ -1,11 +1,18 @@
 package org.devalurum.egrp365bot.utils;
 
 import lombok.experimental.UtilityClass;
+import org.openqa.selenium.WebDriver;
+
+import java.time.Duration;
 
 @UtilityClass
 public final class Constants {
 
-    public final static String EGRP365_URL = "https://egrp365.org/map/?kadnum=%s";
+    public final static String EGRP365_URL = "https://egrp365.ru/map/?kadnum=%s";
+
+    public final static Duration pageLoadTimeout = Duration.ofMinutes(1);
+
+    public final static WebDriver dummyDriver = null;
 
     public final static String CLASS_WITH_COORDINATES = "more-info__info-item-coords";
     public final static String CLASS_WITH_ADDRESS = "address-text";
