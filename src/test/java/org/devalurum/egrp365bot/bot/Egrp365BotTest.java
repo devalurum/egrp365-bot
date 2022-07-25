@@ -2,6 +2,7 @@ package org.devalurum.egrp365bot.bot;
 
 import org.devalurum.egrp365bot.exception.Egrp365BotException;
 import org.devalurum.egrp365bot.model.EgrpEntity;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,11 @@ class Egrp365BotTest {
                         "Координаты", "52.275227, 104.279988"))
                 .build();
 
+    }
+
+    @AfterEach
+    void closeBrowser() {
+        bot.shutdownBot();
     }
 
     @Test
