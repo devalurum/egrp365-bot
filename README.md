@@ -9,8 +9,9 @@
 - Java 11
 - Selenium
 - WebDriverManager
-- Gradle
 - Lombok
+- Gradle
+- JUnit
  
 
 ## Сборка приложения
@@ -32,10 +33,24 @@ gradlew run
 
 # запуск бота с параметром кадастрового номера
 gradlew run --args="38:36:000034:2954"
+```
 
-# либо запуск jar-файла
+### Через jar-файл
+```shell script
+# Склонировать проект к себе
+git clone https://github.com/devalurum/egrp365-bot.git
+
+# загружает gradle wrapper
+gradlew wrapper
+
+# сборка проекта
+gradlew clean build 
+
+# запуск jar-файла
 cd build/libs
 java -jar egrp365-bot.jar
+# или запуск с параметром кадастрового номера
+java -jar egrp365-bot.jar 38:36:000034:2954
 
 # Ввод кадастрового номера (пример)
 > 38:36:000034:2954
